@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const config = require('./config/config')
 
 // Esta API rest se conecta a PostSQL, maneja autenticacion basada en token con credenciales:
 // usuario: asfo y contrasena: holamundo
@@ -11,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 //New Routes
-app.use(require('./routes/index'));
+app.use(require('./routes/routes'));
 
 app.listen(3001);
 console.log('Server on port', 3001);

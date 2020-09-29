@@ -5,9 +5,7 @@ const app = express();
 const config = require('../config/config')
 
 
-
-
-//Instance Pool to connect PostgreSQL
+// Instanciar Pool para conectarse a PostgreSQL
 const { Pool } = require('pg');
 const pool = new Pool({
     user: 'postgres',
@@ -20,6 +18,7 @@ const pool = new Pool({
 // Set JWT
 app.set('llave', config.llave);
 
+// Metodo de creacion elemento BD
 const createPerson = async(req, res) => {
     const errores = validationResult(req);
     if (!errores.isEmpty()) {
@@ -40,52 +39,8 @@ const createPerson = async(req, res) => {
     }
 }
 
-// Metodo de autenticacion con JWT que expira en 24 horas
-const autenticar = async(req, res) => {
-    if (req.body.usuario === "asfo" && req.body.contrasena === "holamundo") {
-        const payload = {
-            check: true
-        };
-        const token = jwt.sign(payload, app.get('llave'), {
-            expiresIn: 1440
-        });
-        res.json({
-            mensaje: 'Autenticación correcta',
-            token: token
-        });
-    } else {
-        res.json({ mensaje: "Usuario o contraseña incorrectos" })
-    }
-}
-
-// MiddleWare to control the autentication
-const rutasProtegidas = express.Router();
-rutasProtegidas.use((req, res, next) => {
-    const token = req.headers['access-token'];
-    if (token) {
-        jwt.verify(token, app.get('llave'), (err, decoded) => {
-            if (err) {
-                return res.json({ mensaje: 'Token inválida' });
-            } else {
-                req.decoded = decoded;
-                next();
-            }
-        });
-    } else {
-        res.send({
-            mensaje: 'Token no proveída.'
-        });
-    }
-});
-
-
-
-
-
-
-// Async function to request the Database
+// Metodo para traer elementos de la BD
 const getPerson = async(req, res) => {
-    // CRUD / READ
     const response = await pool.query('SELECT * FROM person');
     //Parce the Json
     res.status(200).json(response.rows);
@@ -93,20 +48,21 @@ const getPerson = async(req, res) => {
     // res.send('Consulta de total de Personas');
 }
 
-
 const updatePerson = async(req, res) => {
     const id = req.params.id;
     const { name, birth, email } = req.body;
     console.log(name, birth, email);
-    // CRUD / UPDATE
     const response = await pool.query('UPDATE person SET name = $1, birth =$2, email=$3 WHERE id=$4', [name, birth, email, id]);
     console.log(response);
-    res.send('Persona actualizada correctamente');
+    res.status(200).json({
+            respuesta: "Persona Actualizada",
+            token: "Algun token o valor"
+        })
+        // res.send('Persona actualizada correctamente');
 }
 
 const queryPerson = async(req, res) => {
     // res.send('El ID ingresado es: ' + req.params.id);
-    // CRUD / READ
     const response = await pool.query('SELECT * FROM person WHERE ID = $1', [req.params.id]);
     console.log(response);
     res.json(response.rows);
@@ -114,12 +70,10 @@ const queryPerson = async(req, res) => {
 
 const deletePerson = async(req, res) => {
     // res.send('Persona eliminada');
-    // CRUD / DELETE
     const response = await pool.query('DELETE FROM person WHERE id = $1', [req.params.id]);
     console.log(response);
     res.json(`Persona eliminada con ID ${req.params.id} satisfactoriamente`);
 }
-
 
 //Export Functions
 module.exports = {
@@ -127,7 +81,5 @@ module.exports = {
     createPerson,
     queryPerson,
     deletePerson,
-    updatePerson,
-    autenticar,
-    rutasProtegidas
+    updatePerson
 }
