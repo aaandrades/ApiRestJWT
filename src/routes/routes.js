@@ -2,10 +2,14 @@ const { Router } = require('express');
 const router = Router();
 const { check } = require("express-validator")
 const { getPerson, createPerson, queryPerson, deletePerson, updatePerson } = require('../controllers/index.controller.js');
-const { autenticar, rutasProtegidas } = require('../middleware/sesion')
+const autenticar = require('../middleware/sesion')
+const middleware = require('../middleware/middleware')
 
 //Route getPerson
-router.get('/getPerson', rutasProtegidas, getPerson);
+router.get('/getPerson', getPerson);
+
+// Con autenticacion JWT
+// router.get('/getPerson', middleware, getPerson);
 
 //Route createPerson
 router.post('/createPerson', [
@@ -19,8 +23,10 @@ router.get('/consultPerson/:id', [
         check("id", "Ingrese el id del elemento a buscar").not().isEmpty(),
     ],
     queryPerson);
+
 //Route Delete Id for Person
 router.delete('/deletePerson/:id', deletePerson);
+
 //Route Update Person
 router.put('/updatePerson/:id', updatePerson);
 

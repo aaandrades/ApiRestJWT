@@ -51,9 +51,9 @@ const getPerson = async(req, res) => {
 const updatePerson = async(req, res) => {
     const id = req.params.id;
     const { name, birth, email } = req.body;
-    console.log(name, birth, email);
+    // console.log(name, birth, email);
     const response = await pool.query('UPDATE person SET name = $1, birth =$2, email=$3 WHERE id=$4', [name, birth, email, id]);
-    console.log(response);
+    // console.log(response);
     res.status(200).json({
             respuesta: "Persona Actualizada",
             token: "Algun token o valor"
@@ -64,14 +64,13 @@ const updatePerson = async(req, res) => {
 const queryPerson = async(req, res) => {
     // res.send('El ID ingresado es: ' + req.params.id);
     const response = await pool.query('SELECT * FROM person WHERE ID = $1', [req.params.id]);
-    console.log(response);
+    // console.log(response);
     res.json(response.rows);
 }
 
 const deletePerson = async(req, res) => {
     // res.send('Persona eliminada');
     const response = await pool.query('DELETE FROM person WHERE id = $1', [req.params.id]);
-    console.log(response);
     res.json(`Persona eliminada con ID ${req.params.id} satisfactoriamente`);
 }
 

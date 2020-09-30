@@ -3,9 +3,7 @@ const jwt = require('jsonwebtoken')
 const app = express();
 const config = require('../config/config')
 
-
 app.set('llave', config.llave);
-
 
 // Metodo de autenticacion con JWT que expira en 24 horas
 const autenticar = async(req, res) => {
@@ -25,27 +23,4 @@ const autenticar = async(req, res) => {
     }
 }
 
-// MiddleWare para controlar la autenticacion
-const rutasProtegidas = express.Router();
-rutasProtegidas.use((req, res, next) => {
-    const token = req.headers['access-token'];
-    if (token) {
-        jwt.verify(token, app.get('llave'), (err, decoded) => {
-            if (err) {
-                return res.json({ mensaje: 'Token inválida' });
-            } else {
-                req.decoded = decoded;
-                next();
-            }
-        });
-    } else {
-        res.send({
-            mensaje: 'Token no proveída.'
-        });
-    }
-});
-
-module.exports = {
-    autenticar,
-    rutasProtegidas
-}
+module.exports = autenticar;
